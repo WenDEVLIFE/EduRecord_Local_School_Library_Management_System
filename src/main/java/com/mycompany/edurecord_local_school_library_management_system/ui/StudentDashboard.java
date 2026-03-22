@@ -56,6 +56,7 @@ public class StudentDashboard extends JFrame {
         gbc.insets = new Insets(10, 10, 30, 10);
         JButton logoutBtn = createSidebarButton("Logout", "logout");
         logoutBtn.addActionListener(e -> {
+            com.mycompany.edurecord_local_school_library_management_system.services.SessionManager.clearSession();
             dispose();
             new LoginFrame().setVisible(true);
         });

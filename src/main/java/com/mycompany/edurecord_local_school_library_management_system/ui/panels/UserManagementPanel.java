@@ -4,6 +4,7 @@ import com.mycompany.edurecord_local_school_system_library_management_system.uti
 import com.mycompany.edurecord_local_school_library_management_system.models.Course;
 import com.mycompany.edurecord_local_school_library_management_system.models.User;
 import com.mycompany.edurecord_local_school_library_management_system.repositories.UserRepository;
+import com.mycompany.edurecord_local_school_library_management_system.services.SessionManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -228,6 +229,15 @@ public class UserManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Select a user to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        // Prevent admin from deleting their own account
+        User currentUser = SessionManager.getCurrentUser();
+        if (currentUser != null && currentUser.getId() == selectedUserId) {
+            JOptionPane.showMessageDialog(this, "Action Denied: You cannot delete your own account while logged in.",
+                    "Security Constraint", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this user?",
                 "Confirm Delete", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
