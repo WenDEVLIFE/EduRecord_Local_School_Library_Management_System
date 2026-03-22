@@ -117,4 +117,17 @@ public class BookRepository {
         }
         return 0;
     }
+
+    public int getAvailableBooksCount() {
+        String query = "SELECT SUM(quantity) FROM books WHERE quantity > 0";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            if (rs.next())
+                return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

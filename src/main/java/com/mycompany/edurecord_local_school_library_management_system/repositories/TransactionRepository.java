@@ -182,6 +182,32 @@ public class TransactionRepository {
         return 0;
     }
 
+    public int getTodaysBorrowsCount() {
+        String query = "SELECT COUNT(*) FROM transactions WHERE borrow_date = CURDATE()";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            if (rs.next())
+                return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getTodaysReturnsCount() {
+        String query = "SELECT COUNT(*) FROM transactions WHERE status = 'RETURNED' AND return_date = CURDATE()";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            if (rs.next())
+                return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public int getOverdueBooksCount() {
         return 0; // Simplified for now
     }
