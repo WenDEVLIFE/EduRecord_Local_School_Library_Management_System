@@ -109,6 +109,8 @@ public class LoginFrame extends JFrame {
             dispose();
             if ("ADMIN".equals(user.getRole())) {
                 new AdminDashboard().setVisible(true);
+            } else if ("LIBRARIAN".equals(user.getRole())) {
+                new LibrarianDashboard().setVisible(true);
             } else {
                 new MainFrame().setVisible(true);
             }
