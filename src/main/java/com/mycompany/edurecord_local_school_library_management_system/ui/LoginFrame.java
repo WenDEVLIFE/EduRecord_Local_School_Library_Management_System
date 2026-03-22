@@ -1,5 +1,6 @@
 package com.mycompany.edurecord_local_school_library_management_system.ui;
 
+import com.mycompany.edurecord_local_school_system_library_management_system.utils.ColorPalette;
 import com.mycompany.edurecord_local_school_library_management_system.models.User;
 import com.mycompany.edurecord_local_school_library_management_system.services.AuthenticationService;
 import javax.swing.*;

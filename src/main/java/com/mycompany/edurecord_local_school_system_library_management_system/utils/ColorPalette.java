@@ -1,4 +1,4 @@
-package com.mycompany.edurecord_local_school_library_management_system.ui;
+package com.mycompany.edurecord_local_school_system_library_management_system.utils;
 
 import java.awt.Color;
 
