@@ -2,6 +2,7 @@ package com.mycompany.edurecord_local_school_library_management_system.ui;
 
 import com.mycompany.edurecord_local_school_system_library_management_system.utils.ColorPalette;
 import com.mycompany.edurecord_local_school_library_management_system.ui.panels.BookManagementPanel;
+import com.mycompany.edurecord_local_school_library_management_system.ui.panels.LibrarianHomePanel;
 import com.mycompany.edurecord_local_school_library_management_system.ui.panels.StudentManagementPanel;
 import com.mycompany.edurecord_local_school_library_management_system.ui.panels.TransactionManagementPanel;
 import javax.swing.*;
@@ -68,14 +69,12 @@ public class LibrarianDashboard extends JFrame {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
+        // Home Panel
+        contentPanel.add(new LibrarianHomePanel(), "home");
+
         contentPanel.add(new BookManagementPanel(), "books");
         contentPanel.add(new StudentManagementPanel(), "students");
         contentPanel.add(new TransactionManagementPanel(), "transactions");
-
-        // Home/Dashboard Placeholder
-        JPanel homePanel = new JPanel(new BorderLayout());
-        homePanel.add(new JLabel("Librarian Overview - Operational Stats", JLabel.CENTER), BorderLayout.CENTER);
-        contentPanel.add(homePanel, "home");
 
         add(sidebar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
@@ -92,8 +91,8 @@ public class LibrarianDashboard extends JFrame {
         btn.addActionListener(e -> cardLayout.show(contentPanel, cardName));
         return btn;
     }
-    
-    public static void main(String [] args){
+
+    public static void main(String[] args) {
         LibrarianDashboard lib = new LibrarianDashboard();
         lib.setVisible(true);
     }

@@ -1,6 +1,7 @@
 package com.mycompany.edurecord_local_school_library_management_system.ui;
 
 import com.mycompany.edurecord_local_school_system_library_management_system.utils.ColorPalette;
+import com.mycompany.edurecord_local_school_library_management_system.ui.panels.AdminHomePanel;
 import com.mycompany.edurecord_local_school_library_management_system.ui.panels.BookManagementPanel;
 import com.mycompany.edurecord_local_school_library_management_system.ui.panels.UserManagementPanel;
 import com.mycompany.edurecord_local_school_library_management_system.ui.panels.TransactionManagementPanel;
@@ -73,7 +74,7 @@ public class AdminDashboard extends JFrame {
         contentPanel.setBackground(Color.WHITE);
 
         // Panels
-        contentPanel.add(createPlaceholderPanel("Admin Dashboard - Statistics and Overview"), "home");
+        contentPanel.add(new AdminHomePanel(), "home");
         contentPanel.add(new BookManagementPanel(), "books");
         contentPanel.add(new UserManagementPanel(), "users");
         contentPanel.add(new TransactionManagementPanel(), "transactions");
@@ -96,33 +97,6 @@ public class AdminDashboard extends JFrame {
         btn.addActionListener(e -> cardLayout.show(contentPanel, cardName));
 
         return btn;
-    }
-
-    private JPanel createPlaceholderPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-
-        JLabel label = new JLabel(title, JLabel.CENTER);
-        label.setFont(new Font("Serif", Font.BOLD, 32));
-        label.setForeground(ColorPalette.PRIMARY_BURGUNDY);
-
-        panel.add(label, BorderLayout.CENTER);
-
-        // Statistics section placeholder
-        if (title.contains("Dashboard")) {
-            JPanel statsPanel = new JPanel(new GridLayout(1, 4, 20, 20));
-            statsPanel.setBackground(Color.WHITE);
-            statsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-            statsPanel.add(createStatCard("Total Books", "1,250"));
-            statsPanel.add(createStatCard("Available", "840"));
-            statsPanel.add(createStatCard("Borrowed", "410"));
-            statsPanel.add(createStatCard("Students", "350"));
-
-            panel.add(statsPanel, BorderLayout.NORTH);
-        }
-
-        return panel;
     }
 
     private JPanel createStatCard(String title, String value) {
