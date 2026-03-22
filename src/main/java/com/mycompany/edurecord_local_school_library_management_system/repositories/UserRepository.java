@@ -98,6 +98,28 @@ public class UserRepository {
         }
     }
 
+    public User getUserByUsername(String username) {
+        String query = "SELECT * FROM users WHERE username = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFirstName(rs.getString("first_name"));
+                    user.setLastName(rs.getString("last_name"));
+                    user.setRole(rs.getString("role"));
+                    return user;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Not found
+    }
+
     public int getTotalActiveUsers() {
         String query = "SELECT COUNT(*) FROM users";
         try (Connection conn = DatabaseConnection.getConnection();

@@ -81,6 +81,27 @@ public class BookRepository {
         }
     }
 
+    public Book getBookByIsbn(String isbn) {
+        String query = "SELECT * FROM books WHERE isbn = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, isbn);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Book book = new Book();
+                    book.setId(rs.getInt("id"));
+                    book.setTitle(rs.getString("title"));
+                    book.setIsbn(rs.getString("isbn"));
+                    book.setQuantity(rs.getInt("quantity"));
+                    return book;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // Dashboard Statistics Methods
     public int getTotalBooksCount() {
         String query = "SELECT SUM(quantity) FROM books";
