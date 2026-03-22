@@ -169,6 +169,67 @@ public class TransactionRepository {
         return 0;
     }
 
+    public List<Transaction> getTransactionsByUserId(int userId) {
+        List<Transaction> transactions = new ArrayList<>();
+        String query = "SELECT t.*, u.username, b.title as book_title " +
+                "FROM transactions t " +
+                "JOIN users u ON t.user_id = u.id " +
+                "JOIN books b ON t.book_id = b.id " +
+                "WHERE t.user_id = ? ORDER BY t.id DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Transaction t = new Transaction();
+                    t.setId(rs.getInt("id"));
+                    t.setUserId(rs.getInt("user_id"));
+                    t.setBookId(rs.getInt("book_id"));
+                    t.setBorrowDate(rs.getDate("borrow_date"));
+                    t.setReturnDate(rs.getDate("return_date"));
+                    t.setStatus(rs.getString("status"));
+                    t.setUsername(rs.getString("username"));
+                    t.setBookTitle(rs.getString("book_title"));
+                    transactions.add(t);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactions;
+    }
+
+    public int getBorrowedBooksCountByUserId(int userId) {
+        String query = "SELECT COUNT(*) FROM transactions WHERE user_id = ? AND status = 'BORROWED'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getReturnedBooksCountByUserId(int userId) {
+        String query = "SELECT COUNT(*) FROM transactions WHERE user_id = ? AND status = 'RETURNED'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public int getBorrowedBooksCount() {
         String query = "SELECT COUNT(*) FROM transactions WHERE status = 'BORROWED'";
         try (Connection conn = DatabaseConnection.getConnection();

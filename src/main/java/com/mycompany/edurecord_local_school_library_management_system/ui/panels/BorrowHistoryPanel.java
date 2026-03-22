@@ -1,9 +1,14 @@
 package com.mycompany.edurecord_local_school_library_management_system.ui.panels;
 
 import com.mycompany.edurecord_local_school_system_library_management_system.utils.ColorPalette;
+import com.mycompany.edurecord_local_school_library_management_system.models.Transaction;
+import com.mycompany.edurecord_local_school_library_management_system.models.User;
+import com.mycompany.edurecord_local_school_library_management_system.repositories.TransactionRepository;
+import com.mycompany.edurecord_local_school_library_management_system.services.SessionManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 /**
  * Panel for students to view their personal borrowing history.
@@ -14,8 +19,12 @@ public class BorrowHistoryPanel extends JPanel {
 
     private JTable historyTable;
     private DefaultTableModel tableModel;
+    private TransactionRepository transactionRepo;
+    private JPanel infoPanel;
 
     public BorrowHistoryPanel() {
+        transactionRepo = new TransactionRepository();
+
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -30,32 +39,71 @@ public class BorrowHistoryPanel extends JPanel {
         add(header, BorderLayout.NORTH);
 
         // --- Info Section ---
-        JPanel infoPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+        infoPanel = new JPanel(new GridLayout(1, 3, 10, 10));
         infoPanel.setBackground(Color.WHITE);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        infoPanel.add(createCard("Currently Borrowed", "2", ColorPalette.PRIMARY_BURGUNDY));
-        infoPanel.add(createCard("Books Returned", "14", ColorPalette.TEXT_CHARCOAL));
-        infoPanel.add(createCard("Overdue Fines", "None", ColorPalette.SECONDARY_GOLD));
 
         add(infoPanel, BorderLayout.CENTER);
 
         // --- Table Section ---
         String[] columns = { "Book Title", "ISBN", "Borrow Date", "Return Date", "Status" };
-        tableModel = new DefaultTableModel(columns, 0);
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         historyTable = new JTable(tableModel);
         historyTable.setRowHeight(25);
         historyTable.getTableHeader().setBackground(ColorPalette.SECONDARY_GOLD);
+        historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollPane = new JScrollPane(historyTable);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Detailed Records"));
 
-        // Mock data
-        tableModel.addRow(new Object[] { "Software Engineering", "112-233", "2024-03-10", "2024-03-17", "RETURNED" });
-        tableModel.addRow(new Object[] { "Computer Networks", "445-566", "2024-03-20", "-", "BORROWED" });
-
         add(scrollPane, BorderLayout.SOUTH);
         scrollPane.setPreferredSize(new Dimension(800, 300));
+
+        loadStudentData();
+    }
+
+    private void loadStudentData() {
+        User currentUser = SessionManager.getCurrentUser();
+        if (currentUser == null)
+            return; // Guard clause if testing without logging in
+
+        int userId = currentUser.getId();
+
+        // Refresh Stats
+        infoPanel.removeAll();
+        int currentlyBorrowed = transactionRepo.getBorrowedBooksCountByUserId(userId);
+        int totalReturned = transactionRepo.getReturnedBooksCountByUserId(userId);
+
+        infoPanel.add(
+                createCard("Currently Borrowed", String.valueOf(currentlyBorrowed), ColorPalette.PRIMARY_BURGUNDY));
+        infoPanel.add(createCard("Books Returned", String.valueOf(totalReturned), ColorPalette.TEXT_CHARCOAL));
+        infoPanel.add(createCard("Overdue Fines", "None", ColorPalette.SECONDARY_GOLD)); // Placeholder for future logic
+
+        infoPanel.revalidate();
+        infoPanel.repaint();
+
+        // Refresh Table
+        tableModel.setRowCount(0);
+        List<Transaction> transactions = transactionRepo.getTransactionsByUserId(userId);
+        for (Transaction t : transactions) {
+            String returnDateStr = t.getReturnDate() == null ? "-" : t.getReturnDate().toString();
+            // Note: Since we didn't JOIN book ISBN in the customized repo query, we'll
+            // leave it as "View in Catalog" or fetch it.
+            // For now, we will just put a small placeholder to keep it fast, as ISBN isn't
+            // strictly returned in getTransactionsByUserId query.
+            tableModel.addRow(new Object[] {
+                    t.getBookTitle(),
+                    "...", // Placeholder for ISBN
+                    t.getBorrowDate().toString(),
+                    returnDateStr,
+                    t.getStatus()
+            });
+        }
     }
 
     private JPanel createCard(String title, String value, Color color) {

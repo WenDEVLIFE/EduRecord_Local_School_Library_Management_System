@@ -118,6 +118,33 @@ public class BookRepository {
         return 0;
     }
 
+    public List<Book> searchBooks(String keyword) {
+        List<Book> books = new ArrayList<>();
+        String query = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Book book = new Book();
+                    book.setId(rs.getInt("id"));
+                    book.setTitle(rs.getString("title"));
+                    book.setAuthor(rs.getString("author"));
+                    book.setIsbn(rs.getString("isbn"));
+                    book.setQuantity(rs.getInt("quantity"));
+                    book.setCategory(rs.getString("category"));
+                    books.add(book);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return books;
+    }
+
     public int getAvailableBooksCount() {
         String query = "SELECT SUM(quantity) FROM books WHERE quantity > 0";
         try (Connection conn = DatabaseConnection.getConnection();
