@@ -111,6 +111,8 @@ public class LoginFrame extends JFrame {
                 new AdminDashboard().setVisible(true);
             } else if ("LIBRARIAN".equals(user.getRole())) {
                 new LibrarianDashboard().setVisible(true);
+            } else if ("STUDENT".equals(user.getRole())) {
+                new StudentDashboard().setVisible(true);
             } else {
                 new MainFrame().setVisible(true);
             }
