@@ -184,13 +184,14 @@ public class TransactionManagementPanel extends JPanel {
             return;
         }
 
-        if (transactionRepo.borrowBook(user.getId(), book.getId())) {
-            JOptionPane.showMessageDialog(this, "Book borrowed successfully!");
+        String borrowResult = transactionRepo.borrowBook(user.getId(), book.getId());
+        if ("Borrow successful!".equals(borrowResult)) {
+            JOptionPane.showMessageDialog(this, borrowResult);
             studentIdField.setText("");
             bookIsbnField.setText("");
             loadTransactions();
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to process borrow transaction.", "Error",
+            JOptionPane.showMessageDialog(this, borrowResult, "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -205,11 +206,12 @@ public class TransactionManagementPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Mark this book as returned?", "Confirm Return",
                 JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
-            if (transactionRepo.returnBook(selectedTransactionId, selectedBookId)) {
-                JOptionPane.showMessageDialog(this, "Book registered as returned!");
+            String returnResult = transactionRepo.returnBook(selectedTransactionId, selectedBookId);
+            if ("Return successful!".equals(returnResult)) {
+                JOptionPane.showMessageDialog(this, returnResult);
                 loadTransactions();
             } else {
-                JOptionPane.showMessageDialog(this, "Failed to process return.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, returnResult, "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.mycompany.edurecord_local_school_library_management_system.repositories;
 
 import com.mycompany.edurecord_local_school_library_management_system.models.Book;
+import com.mycompany.edurecord_local_school_library_management_system.services.SessionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,15 @@ public class BookRepository {
             stmt.setInt(4, book.getQuantity());
             stmt.setString(5, book.getCategory());
 
-            return stmt.executeUpdate() > 0;
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                String actor = SessionManager.getCurrentUser() != null ? SessionManager.getCurrentUser().getUsername()
+                        : "System";
+                new ActivityLogRepository().logActivity(actor, "Book Added",
+                        "Added book '" + book.getTitle() + "' (ISBN: " + book.getIsbn() + ")");
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -61,7 +70,15 @@ public class BookRepository {
             stmt.setString(5, book.getCategory());
             stmt.setInt(6, book.getId());
 
-            return stmt.executeUpdate() > 0;
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                String actor = SessionManager.getCurrentUser() != null ? SessionManager.getCurrentUser().getUsername()
+                        : "System";
+                new ActivityLogRepository().logActivity(actor, "Book Updated",
+                        "Updated book '" + book.getTitle() + "' (ISBN: " + book.getIsbn() + ")");
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -74,7 +91,14 @@ public class BookRepository {
                 PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                String actor = SessionManager.getCurrentUser() != null ? SessionManager.getCurrentUser().getUsername()
+                        : "System";
+                new ActivityLogRepository().logActivity(actor, "Book Deleted", "Deleted book with ID: " + id);
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

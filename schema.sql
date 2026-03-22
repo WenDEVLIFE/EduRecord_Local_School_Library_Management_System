@@ -42,7 +42,18 @@ CREATE TABLE IF NOT EXISTS transactions (
     FOREIGN KEY (book_id) REFERENCES books(id)
 );
 
+-- Table: activity_logs
+-- Tracks all system actions for the Admin dashboard
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    action_type VARCHAR(100) NOT NULL,
+    details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Initial Mock Data
 INSERT INTO users (username, password, first_name, last_name, role, course) VALUES
 ('admin', 'admin123', 'System', 'Admin', 'ADMIN', 'NONE'),
-('librarian', 'lib123', 'Library', 'Staff', 'LIBRARIAN', 'NONE');
+('librarian', 'lib123', 'Library', 'Staff', 'LIBRARIAN', 'NONE'),
+('student', 'student123', 'John', 'Doe', 'STUDENT', 'BSIT');

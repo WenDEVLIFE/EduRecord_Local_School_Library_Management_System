@@ -2,6 +2,7 @@ package com.mycompany.edurecord_local_school_library_management_system.repositor
 
 import com.mycompany.edurecord_local_school_library_management_system.models.Course;
 import com.mycompany.edurecord_local_school_library_management_system.models.User;
+import com.mycompany.edurecord_local_school_library_management_system.services.SessionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,15 @@ public class UserRepository {
             stmt.setString(5, user.getRole());
             stmt.setString(6, user.getCourse() != null ? user.getCourse().name() : "NONE");
 
-            return stmt.executeUpdate() > 0;
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                String actor = SessionManager.getCurrentUser() != null ? SessionManager.getCurrentUser().getUsername()
+                        : "System";
+                new ActivityLogRepository().logActivity(actor, "User Added",
+                        "Created user '" + user.getUsername() + "' (" + user.getRole() + ")");
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -78,7 +87,15 @@ public class UserRepository {
             stmt.setString(6, user.getCourse() != null ? user.getCourse().name() : "NONE");
             stmt.setInt(7, user.getId());
 
-            return stmt.executeUpdate() > 0;
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                String actor = SessionManager.getCurrentUser() != null ? SessionManager.getCurrentUser().getUsername()
+                        : "System";
+                new ActivityLogRepository().logActivity(actor, "User Updated",
+                        "Updated user '" + user.getUsername() + "' (ID: " + user.getId() + ")");
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -91,7 +108,14 @@ public class UserRepository {
                 PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                String actor = SessionManager.getCurrentUser() != null ? SessionManager.getCurrentUser().getUsername()
+                        : "System";
+                new ActivityLogRepository().logActivity(actor, "User Deleted", "Deleted user with ID: " + id);
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

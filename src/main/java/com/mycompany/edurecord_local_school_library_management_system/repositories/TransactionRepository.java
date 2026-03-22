@@ -1,6 +1,7 @@
 package com.mycompany.edurecord_local_school_library_management_system.repositories;
 
 import com.mycompany.edurecord_local_school_library_management_system.models.Transaction;
+import com.mycompany.edurecord_local_school_library_management_system.services.SessionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class TransactionRepository {
         return transactions;
     }
 
-    public boolean borrowBook(int userId, int bookId) {
+    public String borrowBook(int userId, int bookId) {
         // 1. Check if book exists and has quantity > 0
         String checkQuery = "SELECT quantity FROM books WHERE id = ?";
         String updateBookQuery = "UPDATE books SET quantity = quantity - 1 WHERE id = ?";
@@ -56,14 +57,14 @@ public class TransactionRepository {
                     if (rs.next()) {
                         currentQty = rs.getInt("quantity");
                     } else {
-                        return false; // Book not found
+                        return "Borrow failed: Book not found.";
                     }
                 }
             }
 
             if (currentQty <= 0) {
                 conn.rollback();
-                return false; // Not enough quantity
+                return "Borrow failed: Not enough quantity.";
             }
 
             // 2. Deduct quantity
@@ -76,11 +77,19 @@ public class TransactionRepository {
             try (PreparedStatement insertStmt = conn.prepareStatement(insertTransQuery)) {
                 insertStmt.setInt(1, userId);
                 insertStmt.setInt(2, bookId);
-                insertStmt.executeUpdate();
+                if (insertStmt.executeUpdate() > 0) {
+                    conn.commit();
+                    String actor = SessionManager.getCurrentUser() != null
+                            ? SessionManager.getCurrentUser().getUsername()
+                            : "System";
+                    new ActivityLogRepository().logActivity(actor, "Book Borrowed",
+                            "User ID " + userId + " borrowed Book ID " + bookId);
+                    return "Borrow successful!";
+                } else {
+                    conn.rollback();
+                    return "Borrow failed: Could not create transaction record.";
+                }
             }
-
-            conn.commit();
-            return true;
 
         } catch (SQLException e) {
             if (conn != null) {
@@ -91,7 +100,7 @@ public class TransactionRepository {
                 }
             }
             e.printStackTrace();
-            return false;
+            return "Borrow failed due to a database error.";
         } finally {
             if (conn != null) {
                 try {
@@ -104,7 +113,7 @@ public class TransactionRepository {
         }
     }
 
-    public boolean returnBook(int transactionId, int bookId) {
+    public String returnBook(int transactionId, int bookId) {
         String updateTransQuery = "UPDATE transactions SET status = 'RETURNED', return_date = CURDATE() WHERE id = ? AND status = 'BORROWED'";
         String updateBookQuery = "UPDATE books SET quantity = quantity + 1 WHERE id = ?";
 
@@ -122,7 +131,7 @@ public class TransactionRepository {
 
             if (updatedRows == 0) {
                 conn.rollback();
-                return false; // Transaction not found or already returned
+                return "Return failed: Transaction not found or already returned.";
             }
 
             // 2. Add back to inventory
@@ -132,7 +141,11 @@ public class TransactionRepository {
             }
 
             conn.commit();
-            return true;
+            String actor = SessionManager.getCurrentUser() != null ? SessionManager.getCurrentUser().getUsername()
+                    : "System";
+            new ActivityLogRepository().logActivity(actor, "Book Returned",
+                    "Transaction " + transactionId + " marked as RETURNED");
+            return "Return successful!";
 
         } catch (SQLException e) {
             if (conn != null) {
@@ -143,7 +156,7 @@ public class TransactionRepository {
                 }
             }
             e.printStackTrace();
-            return false;
+            return "Return failed due to database error.";
         } finally {
             if (conn != null) {
                 try {

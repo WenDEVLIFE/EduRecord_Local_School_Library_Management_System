@@ -3,6 +3,7 @@ package com.mycompany.edurecord_local_school_library_management_system.services;
 import com.mycompany.edurecord_local_school_library_management_system.models.User;
 import com.mycompany.edurecord_local_school_library_management_system.models.Course;
 import com.mycompany.edurecord_local_school_library_management_system.repositories.DatabaseConnection;
+import com.mycompany.edurecord_local_school_library_management_system.repositories.ActivityLogRepository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,6 +55,9 @@ public class AuthenticationService {
 
                     // Set session globally
                     SessionManager.setCurrentUser(user);
+
+                    // Log the activity
+                    new ActivityLogRepository().logActivity(user.getUsername(), "Login", "Successful system access.");
 
                     return user;
                 }
