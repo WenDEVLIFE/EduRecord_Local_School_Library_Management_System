@@ -44,6 +44,20 @@ public class MainFrame extends JFrame {
         welcomeLabel.setForeground(ColorPalette.TEXT_CHARCOAL);
         contentPanel.add(welcomeLabel);
 
+        JButton aboutButton = new JButton("System Info & Scope");
+        aboutButton.setBackground(ColorPalette.SECONDARY_GOLD);
+        aboutButton.setForeground(Color.BLACK);
+        aboutButton.setFocusPainted(false);
+        aboutButton.addActionListener(e -> {
+            new AboutFrame(this).setVisible(true);
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(20, 0, 0, 0);
+        contentPanel.add(aboutButton, gbc);
+
         // Footer Panel
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(ColorPalette.TEXT_CHARCOAL);

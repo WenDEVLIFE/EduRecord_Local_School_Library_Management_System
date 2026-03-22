@@ -12,17 +12,20 @@ public class User {
     private String firstName;
     private String lastName;
     private String role; // e.g., "ADMIN", "STUDENT", "LIBRARIAN"
+    private Course course;
 
     public User() {
     }
 
-    public User(int id, String username, String password, String firstName, String lastName, String role) {
+    public User(int id, String username, String password, String firstName, String lastName, String role,
+            Course course) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
+        this.course = course;
     }
 
     // Getters and Setters
@@ -74,8 +77,16 @@ public class User {
         this.role = role;
     }
 
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
     @Override
     public String toString() {
-        return "User{" + "username=" + username + ", role=" + role + '}';
+        return "User{" + "username=" + username + ", role=" + role + ", course=" + course + '}';
     }
 }
