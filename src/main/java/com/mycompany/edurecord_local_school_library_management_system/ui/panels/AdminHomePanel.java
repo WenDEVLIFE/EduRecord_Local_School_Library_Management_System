@@ -1,6 +1,9 @@
 package com.mycompany.edurecord_local_school_library_management_system.ui.panels;
 
 import com.mycompany.edurecord_local_school_system_library_management_system.utils.ColorPalette;
+import com.mycompany.edurecord_local_school_library_management_system.repositories.BookRepository;
+import com.mycompany.edurecord_local_school_library_management_system.repositories.UserRepository;
+import com.mycompany.edurecord_local_school_library_management_system.repositories.TransactionRepository;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -30,10 +33,17 @@ public class AdminHomePanel extends JPanel {
         statsPanel.setBackground(Color.WHITE);
         statsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        statsPanel.add(createStatCard("Total Books", "1,250", ColorPalette.PRIMARY_BURGUNDY));
-        statsPanel.add(createStatCard("Active Users", "480", ColorPalette.TEXT_CHARCOAL));
-        statsPanel.add(createStatCard("Total Transactions", "2,100", ColorPalette.SECONDARY_GOLD));
-        statsPanel.add(createStatCard("Overdue Books", "12", Color.RED));
+        BookRepository bookRepo = new BookRepository();
+        UserRepository userRepo = new UserRepository();
+        TransactionRepository transRepo = new TransactionRepository();
+
+        statsPanel.add(createStatCard("Total Books", String.valueOf(bookRepo.getTotalBooksCount()),
+                ColorPalette.PRIMARY_BURGUNDY));
+        statsPanel.add(createStatCard("Active Users", String.valueOf(userRepo.getTotalActiveUsers()),
+                ColorPalette.TEXT_CHARCOAL));
+        statsPanel.add(createStatCard("Total Transactions", String.valueOf(transRepo.getTotalTransactionsCount()),
+                ColorPalette.SECONDARY_GOLD));
+        statsPanel.add(createStatCard("Overdue Books", String.valueOf(transRepo.getOverdueBooksCount()), Color.RED));
 
         add(statsPanel, BorderLayout.NORTH);
 
