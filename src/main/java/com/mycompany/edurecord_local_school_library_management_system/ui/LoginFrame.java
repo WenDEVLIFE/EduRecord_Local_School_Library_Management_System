@@ -107,7 +107,11 @@ public class LoginFrame extends JFrame {
         if (user != null) {
             JOptionPane.showMessageDialog(this, "Login Successful! Welcome " + user.getFirstName());
             dispose();
-            new MainFrame().setVisible(true);
+            if ("ADMIN".equals(user.getRole())) {
+                new AdminDashboard().setVisible(true);
+            } else {
+                new MainFrame().setVisible(true);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Invalid credentials.", "Login Failed", JOptionPane.ERROR_MESSAGE);
         }
